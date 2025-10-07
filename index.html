@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Monte Seu PC</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+
+    <!-- Cabeçalho -->
+    <header>
+        <div class="logo">MonteSeuPC</div>
+        <nav>
+            <ul>
+                <li><a href="#">Home</a></li>
+                <li><a href="#">Configurações Salvas</a></li>
+                <li><a href="#">Sobre</a></li>
+                <li><a href="#">Contato</a></li>
+            </ul>
+        </nav>
+    </header>
+
+    <!-- Banner -->
+    <section class="banner">
+        <h1>Monte o computador dos seus sonhos!</h1>
+        <p>Escolha os melhores componentes para o seu PC de forma fácil e rápida.</p>
+        <a href="#montagem" class="cta-btn">Comece Agora</a>
+    </section>
+
+    <!-- Seção de Montagem -->
+    <section id="montagem" class="montagem">
+        <h2>Escolha seus componentes</h2>
+        <div class="componentes">
+            <div class="componente">
+                <label for="processador">Processador</label>
+                <select id="processador">
+                    <option value="intel">Intel i7</option>
+                    <option value="amd">AMD Ryzen 7</option>
+                </select>
+            </div>
+            <div class="componente">
+                <label for="placa-mae">Placa-Mãe</label>
+                <select id="placa-mae">
+                    <option value="asus">ASUS ROG</option>
+                    <option value="msi">MSI B450</option>
+                </select>
+            </div>
+            <!-- Outros componentes aqui -->
+        </div>
+
+        <div class="resumo-config">
+            <h3>Resumo da sua configuração</h3>
+            <ul id="resumo">
+                <!-- Aqui vai aparecer as escolhas do usuário -->
+            </ul>
+        </div>
+    </section>
+
+    <!-- Rodapé -->
+    <footer>
+        <p>&copy; 2025 MonteSeuPC. Todos os direitos reservados.</p>
+    </footer>
+
+    <script src="scripts.js"></script>
+</body>
+</html>
