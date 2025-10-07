@@ -1,6 +1,4 @@
-// scripts.js
-
-// Lista de todos os campos de componentes
+// Lista de IDs dos campos de seleção de componentes
 const campos = [
     'processador',
     'placa-mae',
@@ -13,6 +11,7 @@ const campos = [
 
 const listaResumo = document.getElementById('resumo');
 
+// Atualiza o resumo com as seleções atuais
 function atualizarResumo() {
     listaResumo.innerHTML = '';
 
@@ -26,11 +25,11 @@ function atualizarResumo() {
     });
 }
 
-// Adiciona eventos para atualizar ao mudar seleção
+// Adiciona eventos aos selects
 campos.forEach(campoId => {
     const select = document.getElementById(campoId);
     select.addEventListener('change', atualizarResumo);
 });
 
-// Atualiza quando a página carrega
+// Atualiza o resumo ao carregar a página
 window.addEventListener('DOMContentLoaded', atualizarResumo);
