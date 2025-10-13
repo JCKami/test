@@ -3,259 +3,183 @@
 <head>
 <meta charset="utf-8" />
 <meta name="viewport" content="width=device-width,initial-scale=1" />
-<title>Zona de Troll — Brinque com os amigos</title>
+<title>Surpresa</title>
 <style>
-  :root{--bg:#0f1724;--card:#0b1220;--accent:#ff5c8a;--muted:#9aa4b2;--glass: rgba(255,255,255,0.03);}
+  :root{
+    --bg:#0b1220;
+    --card:#0f1724;
+    --accent:#ff3b30;
+    --muted:#9aa4b2;
+  }
   *{box-sizing:border-box;font-family:Inter,system-ui,Segoe UI,Roboto,Arial,sans-serif}
-  body{margin:0;background:linear-gradient(180deg,#061024 0%, #071428 100%);color:#e6eef6;min-height:100vh;display:flex;align-items:center;justify-content:center;padding:24px}
-  .wrap{width:100%;max-width:980px;background:linear-gradient(180deg, rgba(255,255,255,0.02), rgba(255,255,255,0.01));border-radius:12px;padding:24px;box-shadow:0 8px 30px rgba(2,6,23,0.6)}
-  header{display:flex;align-items:center;gap:16px}
-  .logo{width:64px;height:64px;border-radius:12px;background:linear-gradient(135deg,var(--accent),#7b61ff);display:flex;align-items:center;justify-content:center;font-weight:700}
-  h1{margin:0;font-size:20px}
-  p.lead{color:var(--muted);margin-top:6px;margin-bottom:18px}
-  .grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:12px}
-  .card{background:var(--card);padding:14px;border-radius:10px;border:1px solid rgba(255,255,255,0.03)}
-  button.btn{width:100%;padding:10px 12px;border-radius:8px;border:0;background:linear-gradient(90deg,var(--accent),#7b61ff);color:white;font-weight:600;cursor:pointer}
-  button.ghost{background:transparent;border:1px solid rgba(255,255,255,0.06);color:var(--muted);padding:9px;border-radius:8px;cursor:pointer}
-  #stage{margin-top:18px;min-height:260px;border-radius:10px;padding:18px;background:var(--glass);position:relative;overflow:hidden}
-  .hidden{display:none}
-  .big{font-size:36px;font-weight:700}
-  /* faux update */
-  .update{display:flex;flex-direction:column;gap:10px;align-items:center;justify-content:center;height:100%}
-  .bar{width:70%;height:18px;background:rgba(255,255,255,0.06);border-radius:10px;overflow:hidden}
-  .fill{height:100%;width:0;background:linear-gradient(90deg,#4ade80,#f59e0b);transition:width 300ms linear}
-  .center{display:flex;align-items:center;justify-content:center;height:100%}
-  /* rickroll iframe */
-  iframe{width:100%;height:100%;border:0;border-radius:8px}
-  footer{display:flex;gap:8px;align-items:center;margin-top:12px;justify-content:space-between}
-  small{color:var(--muted)}
-  .confetti-canvas{position:absolute;left:0;top:0;width:100%;height:100%;pointer-events:none}
+  html,body{height:100%;margin:0;background:linear-gradient(180deg,#071022,#021018);color:#eef3f8}
+  .wrap{min-height:100%;display:flex;align-items:center;justify-content:center;padding:28px}
+  .card{width:100%;max-width:720px;background:rgba(255,255,255,0.02);padding:28px;border-radius:12px;text-align:center;border:1px solid rgba(255,255,255,0.03);box-shadow:0 10px 30px rgba(2,6,23,0.6)}
+  h1{margin:0;font-size:24px}
+  p{color:var(--muted)}
+  .btn{margin-top:18px;padding:10px 14px;border-radius:8px;border:0;background:linear-gradient(90deg,#7b61ff,#ff5c8a);color:white;font-weight:700;cursor:pointer}
+  /* tela de susto (fullscreen) */
+  .scare {
+    position:fixed;left:0;top:0;width:100%;height:100%;display:flex;align-items:center;justify-content:center;
+    background:var(--accent);color:white;flex-direction:column;z-index:9999;
+    transform:scale(0.98);opacity:0;
+    transition:transform .12s ease-out,opacity .12s ease-out;
+  }
+  .scare.show{transform:scale(1);opacity:1;}
+  .scare h2{font-size:96px;margin:0;letter-spacing:6px;text-shadow:0 8px 30px rgba(0,0,0,0.4)}
+  .scare p{font-size:20px;margin-top:10px}
+  /* efeito shake */
+  @keyframes shake {
+    0%{transform:translateX(0)}
+    10%{transform:translateX(-18px)}
+    20%{transform:translateX(14px)}
+    30%{transform:translateX(-10px)}
+    40%{transform:translateX(8px)}
+    50%{transform:translateX(-6px)}
+    60%{transform:translateX(4px)}
+    70%{transform:translateX(-2px)}
+    100%{transform:translateX(0)}
+  }
+  .scare.show h2{animation:shake .6s cubic-bezier(.36,.07,.19,.97) 0s both}
+  .small-note{margin-top:12px;color:var(--muted);font-size:13px}
+  .controls{margin-top:14px;display:flex;gap:8px;justify-content:center}
+  .ghost{background:transparent;border:1px solid rgba(255,255,255,0.06);color:var(--muted);padding:8px 10px;border-radius:8px;cursor:pointer}
 </style>
 </head>
 <body>
   <div class="wrap">
-    <header>
-      <div class="logo">T</div>
-      <div>
-        <h1>Zona de Troll</h1>
-        <p class="lead">Trollagens leves e seguras — personalize e compartilhe com os amigos.</p>
+    <div class="card" role="main">
+      <h1>Um pequeno teste de coragem</h1>
+      <p>Fique tranquilo — é só uma brincadeira. Clique no botão abaixo ou espere alguns segundos para a surpresa.</p>
+      <div class="controls">
+        <button class="btn" id="startBtn">Ver a surpresa</button>
+        <button class="ghost" id="cancelBtn">Cancelar</button>
       </div>
-    </header>
-
-    <div class="grid" style="margin-top:14px">
-      <div class="card">
-        <h3>Pranks rápidos</h3>
-        <p class="lead" style="margin:6px 0 12px 0">Clique para ativar</p>
-        <button class="btn" id="btn-rick">🎵 Rickroll (música)</button>
-        <div style="height:8px"></div>
-        <button class="btn" id="btn-update">🔄 Falsa atualização do sistema</button>
-        <div style="height:8px"></div>
-        <button class="btn" id="btn-confetti">🎉 Confete Explosivo</button>
-      </div>
-
-      <div class="card">
-        <h3>Interativos</h3>
-        <p class="lead" style="margin:6px 0 12px 0">Gerar reações</p>
-        <button class="ghost" id="btn-quiz">❓ Quiz Troll (resposta aleatória)</button>
-        <div style="height:8px"></div>
-        <button class="ghost" id="btn-surprise">🖼️ Surpresa (imagem)</button>
-      </div>
-
-      <div class="card">
-        <h3>Compartilhar</h3>
-        <p class="lead" style="margin:6px 0 12px 0">Como enviar para os amigos</p>
-        <ol style="padding-left:16px;margin:0;color:var(--muted)">
-          <li>Salve como <code>index.html</code></li>
-          <li>Envie por messenger, Discord ou hospede no GitHub Pages</li>
-          <li>Personalize mensagens pra cada amigo</li>
-        </ol>
-      </div>
+      <p class="small-note">Compartilhe com cuidado 😉</p>
     </div>
+  </div>
 
-    <div id="stage" aria-live="polite">
-      <div id="welcome" class="center">
-        <div style="text-align:center">
-          <div class="big">Escolha um prank</div>
-          <div style="color:var(--muted);margin-top:8px">Experimente: Rickroll é sempre clássico 😉</div>
-        </div>
-      </div>
-
-      <!-- confetti canvas -->
-      <canvas id="confetti" class="confetti-canvas"></canvas>
-
-      <!-- container de conteúdo dinâmico -->
-      <div id="dynamic" class="hidden"></div>
+  <!-- Layer do susto -->
+  <div id="scare" class="scare" aria-hidden="true">
+    <h2 id="scareText">BOO!</h2>
+    <p id="scareSub">Você foi pego!</p>
+    <div style="margin-top:18px">
+      <button class="ghost" id="muteBtn">Desativar Som</button>
+      <button class="ghost" id="closeBtn">Fechar</button>
     </div>
-
-    <footer>
-      <small>Use com responsabilidade — nada ilegal ou que exponha pessoas.</small>
-      <small>Personalize os textos para ficar ainda mais engraçado!</small>
-    </footer>
   </div>
 
 <script>
-/* ===== utilidades ===== */
-const stage = document.getElementById('stage');
-const dyn = document.getElementById('dynamic');
-const welcome = document.getElementById('welcome');
+/*
+  Single-file "jump scare" leve:
+  - Pode ser ativado por clique (recomendado — navegadores exigem gesto para tocar som).
+  - Também tenta ativar automaticamente após X segundos; se o áudio for bloqueado, aparece botão pra tocar som.
+  - Use com responsabilidade.
+*/
+const startBtn = document.getElementById('startBtn');
+const cancelBtn = document.getElementById('cancelBtn');
+const scare = document.getElementById('scare');
+const closeBtn = document.getElementById('closeBtn');
+const muteBtn = document.getElementById('muteBtn');
 
-function showHTML(html){
-  welcome.classList.add('hidden');
-  dyn.classList.remove('hidden');
-  dyn.innerHTML = html;
-}
+let autoTimer = null;
+let soundEnabled = true;
+let audioAllowed = false; // será verdadeiro se o áudio tocar com sucesso
 
-/* ===== Rickroll (iframe) =====
-   Note: link below é o vídeo "Never Gonna Give You Up" no YouTube.
-   Se quiser, troque a URL por outra. */
-document.getElementById('btn-rick').addEventListener('click', ()=>{
-  showHTML(`<div style="height:100%;display:flex;flex-direction:column">
-    <div style="font-weight:700;margin-bottom:8px">🎵 Preparando surpresa...</div>
-    <div style="flex:1">
-      <iframe src="https://www.youtube.com/embed/dQw4w9WgXcQ?autoplay=1&rel=0" allow="autoplay; encrypted-media" title="Rickroll"></iframe>
-    </div>
-  </div>`);
-});
-
-/* ===== Falsa atualização ===== */
-document.getElementById('btn-update').addEventListener('click', ()=>{
-  showHTML(`<div class="update">
-    <div style="font-size:20px;font-weight:700">Atualizando componentes do sistema</div>
-    <div style="color:var(--muted)">Não desligue o PC — isso pode levar alguns segundos.</div>
-    <div class="bar"><div id="fill" class="fill"></div></div>
-    <div id="percent" style="color:var(--muted)">0%</div>
-  </div>`);
-  // animação de progresso
-  const fill = document.getElementById('fill');
-  const percent = document.getElementById('percent');
-  let p = 0;
-  const steps = [5, 12, 24, 37, 55, 63, 71, 82, 91, 97, 100];
-  let idx = 0;
-  const interval = setInterval(()=>{
-    p = steps[idx++];
-    fill.style.width = p + '%';
-    percent.textContent = p + '%';
-    if(idx >= steps.length){
-      clearInterval(interval);
-      // revela surpresa
-      setTimeout(()=> {
-        showHTML(`<div style="display:flex;flex-direction:column;align-items:center;justify-content:center;height:100%">
-          <div style="font-size:24px;font-weight:800">Pronto!</div>
-          <div style="color:var(--muted);margin-top:6px">Mas... era só uma trollagem 😈</div>
-          <button class="btn" id="btn-confetti2" style="margin-top:12px">Explodir confete</button>
-        </div>`);
-        document.getElementById('btn-confetti2').addEventListener('click', startConfetti);
-      },700);
+// Cria um som breve (WebAudio) — ruído curto e impacto
+const AudioContext = window.AudioContext || window.webkitAudioContext;
+let actx = null;
+function playScareSound(){
+  try{
+    if(!AudioContext) return false;
+    if(!actx) actx = new AudioContext();
+    const now = actx.currentTime;
+    // criar ruído branco com envelope curto
+    const bufferSize = 2 * actx.sampleRate;
+    const buffer = actx.createBuffer(1, bufferSize, actx.sampleRate);
+    const data = buffer.getChannelData(0);
+    for(let i=0;i<bufferSize;i++){
+      // ruído com envelope
+      data[i] = (Math.random()*2-1) * Math.exp(-i/(0.5*actx.sampleRate));
     }
-  },650);
-});
+    const noise = actx.createBufferSource();
+    noise.buffer = buffer;
 
-/* ===== Confetti simples =====
-   Implementação minimalista, sem libs externas. */
-const canvas = document.getElementById('confetti');
-const ctx = canvas.getContext('2d');
-let confettiPieces = [];
-function resizeCanvas(){ canvas.width = stage.clientWidth; canvas.height = stage.clientHeight; }
-window.addEventListener('resize', resizeCanvas);
-resizeCanvas();
+    // filtro para dar "impacto"
+    const band = actx.createBiquadFilter();
+    band.type = 'highpass';
+    band.frequency.value = 600;
+    band.Q.value = 0.7;
 
-function rand(min,max){ return Math.random()*(max-min)+min; }
-function createConfetti(count=80){
-  confettiPieces = [];
-  for(let i=0;i<count;i++){
-    confettiPieces.push({
-      x: rand(0,canvas.width),
-      y: rand(-canvas.height,0),
-      w: rand(6,12),
-      h: rand(8,16),
-      angle: rand(0,360),
-      speed: rand(1,4),
-      rot: rand(-0.1,0.1),
-      color: ['#ff5c8a','#7b61ff','#ffd166','#06d6a0','#4ade80'][Math.floor(rand(0,5))]
-    });
+    // gain envelope
+    const gain = actx.createGain();
+    gain.gain.setValueAtTime(0.0001, now);
+    gain.gain.exponentialRampToValueAtTime(1.2, now + 0.02);
+    gain.gain.exponentialRampToValueAtTime(0.0001, now + 0.35);
+
+    noise.connect(band);
+    band.connect(gain);
+    gain.connect(actx.destination);
+
+    noise.start(now);
+    noise.stop(now + 0.5);
+    return true;
+  }catch(e){
+    return false;
   }
 }
-let confettiAnim = null;
-function drawConfetti(){
-  ctx.clearRect(0,0,canvas.width,canvas.height);
-  for(const p of confettiPieces){
-    ctx.save();
-    ctx.translate(p.x,p.y);
-    ctx.rotate(p.angle);
-    ctx.fillStyle = p.color;
-    ctx.fillRect(-p.w/2,-p.h/2,p.w,p.h);
-    ctx.restore();
-    p.y += p.speed;
-    p.angle += p.rot;
-    if(p.y > canvas.height + 20){
-      p.y = rand(-40, -10);
-      p.x = rand(0,canvas.width);
-    }
+
+function showScare(withSoundAttempt = true){
+  // mostra visual
+  scare.setAttribute('aria-hidden', 'false');
+  requestAnimationFrame(()=> scare.classList.add('show'));
+  // tenta tocar som
+  if(soundEnabled && withSoundAttempt){
+    const played = playScareSound();
+    if(played) audioAllowed = true;
   }
 }
-function startConfetti(){
-  canvas.style.pointerEvents='none';
-  createConfetti(120);
-  if(confettiAnim) cancelAnimationFrame(confettiAnim);
-  function loop(){ drawConfetti(); confettiAnim = requestAnimationFrame(loop); }
-  loop();
-  // para depois de 6s
-  setTimeout(()=>{ if(confettiAnim) cancelAnimationFrame(confettiAnim); ctx.clearRect(0,0,canvas.width,canvas.height); },6000);
+
+function hideScare(){
+  scare.classList.remove('show');
+  setTimeout(()=> scare.setAttribute('aria-hidden','true'), 300);
 }
-document.getElementById('btn-confetti').addEventListener('click', ()=>{
-  showHTML(`<div style="height:100%;display:flex;align-items:center;justify-content:center;flex-direction:column">
-    <div style="font-weight:800;font-size:20px">Preparando confete...</div>
-    <div style="color:var(--muted);margin-top:8px">Aperte o botão para explodir 🎉</div>
-    <button class="btn" id="go-conf" style="margin-top:12px">💥 Explodir!</button>
-  </div>`);
-  document.getElementById('go-conf').addEventListener('click', ()=>{
-    startConfetti();
-  });
+
+// eventos
+startBtn.addEventListener('click', (e)=>{
+  // cancelar timer se existir
+  if(autoTimer) { clearTimeout(autoTimer); autoTimer = null; }
+  // tentar ativar áudio — necessário gesto do usuário
+  const ok = playScareSound();
+  if(ok) audioAllowed = true;
+  showScare(!ok ? false : true);
 });
 
-/* ===== Quiz troll (respostas aleatórias) ===== */
-const respostas = [
-  "Você comeu a última fatia de pizza 🍕",
-  "Você é secretamente um super-herói 🦸",
-  "Você foi hackeado... por amor ❤️",
-  "Você ganhou um unicórnio (virtual) 🦄",
-  "Hoje é seu dia de sorte: trouxe brigadeiro 🍫",
-  "Alerta: amigo altamente trollável detectado 😏"
-];
-document.getElementById('btn-quiz').addEventListener('click', ()=>{
-  showHTML(`<div style="display:flex;flex-direction:column;align-items:center;justify-content:center;height:100%">
-    <div style="font-weight:800">Quiz express</div>
-    <div style="color:var(--muted);margin-top:6px">Responda a 1 pergunta:</div>
-    <div style="margin-top:12px;width:100%;max-width:420px">
-      <label style="display:block;color:var(--muted)">Qual seu nome?</label>
-      <input id="qname" style="width:100%;padding:10px;border-radius:8px;border:1px solid rgba(255,255,255,0.04);background:transparent;color:inherit" placeholder="Digite aqui" />
-      <button class="btn" id="qgo" style="margin-top:10px">Descobrir destino</button>
-    </div>
-  </div>`);
-  document.getElementById('qgo').addEventListener('click', ()=>{
-    const name = document.getElementById('qname').value || 'Amigo';
-    const r = respostas[Math.floor(Math.random()*respostas.length)];
-    showHTML(`<div style="display:flex;flex-direction:column;align-items:center;justify-content:center;height:100%">
-      <div style="font-size:22px;font-weight:800">${name}, resultado:</div>
-      <div style="margin-top:8px;color:var(--muted)">${r}</div>
-      <button class="btn" style="margin-top:12px" id="again">Tentar de novo</button>
-    </div>`);
-    document.getElementById('again').addEventListener('click', ()=> document.getElementById('btn-quiz').click());
-  });
+cancelBtn.addEventListener('click', ()=>{
+  if(autoTimer){ clearTimeout(autoTimer); autoTimer = null; alert('Surpresa cancelada.'); }
+  else alert('Nenhum timer ativo — clique em "Ver a surpresa" para ver.');
 });
 
-/* ===== Surpresa de imagem ===== */
-document.getElementById('btn-surprise').addEventListener('click', ()=>{
-  showHTML(`<div style="display:flex;flex-direction:column;height:100%">
-    <div style="font-weight:800;margin-bottom:8px">Olhe o que encontrei!</div>
-    <div style="flex:1;background:#061024;border-radius:8px;display:flex;align-items:center;justify-content:center">
-      <img src="https://media.giphy.com/media/3o7qE1YN7aBOFPRw8E/giphy.gif" alt="surpresa" style="max-width:100%;max-height:100%;border-radius:8px" />
-    </div>
-  </div>`);
+closeBtn.addEventListener('click', hideScare);
+
+muteBtn.addEventListener('click', ()=>{
+  soundEnabled = false;
+  alert('Som desativado.');
 });
 
-/* inicial */
-(function init(){ /* nada por enquanto */ })();
+// tentativa automática após 5s (apenas visual se áudio bloqueado)
+autoTimer = setTimeout(()=>{
+  // ao tentar tocar antes de interação, muitos navegadores bloquearão; ainda assim mostramos visual.
+  const played = playScareSound();
+  if(played) audioAllowed = true;
+  showScare(!played ? false : true);
+  autoTimer = null;
+}, 5000);
+
+// Se quiser personalizar os textos, altere estes valores:
+document.getElementById('scareText').textContent = 'BOO!';
+document.getElementById('scareSub').textContent = 'Peguei você!';
+
 </script>
 </body>
 </html>
