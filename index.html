@@ -1,64 +1,3 @@
-<!doctype html>
-<html lang="pt-BR">
-<head>
-<meta charset="utf-8" />
-<meta name="viewport" content="width=device-width,initial-scale=1" />
-<title>Ghost Tech - Borba Tech</title>
-<style>
-  :root{
-    --bg:#0b1220;
-    --card:#0f1724;
-    --accent:#ff3b30;
-    --muted:#9aa4b2;
-  }
-  *{box-sizing:border-box;font-family:Inter,system-ui,Segoe UI,Roboto,Arial,sans-serif}
-  html,body{height:100%;margin:0;background:linear-gradient(180deg,#071022,#021018);color:#eef3f8}
-  .wrap{min-height:100%;display:flex;align-items:center;justify-content:center;padding:28px}
-  .card{width:100%;max-width:720px;background:rgba(255,255,255,0.02);padding:28px;border-radius:12px;text-align:center;border:1px solid rgba(255,255,255,0.03);box-shadow:0 10px 30px rgba(2,6,23,0.6)}
-  h1{margin:0;font-size:24px}
-  p{color:var(--muted)}
-  .btn{margin-top:18px;padding:10px 14px;border-radius:8px;border:0;background:linear-gradient(90deg,#7b61ff,#ff5c8a);color:white;font-weight:700;cursor:pointer}
-  /* tela de susto (fullscreen) */
-  .scare {
-    position:fixed;left:0;top:0;width:100%;height:100%;display:flex;align-items:center;justify-content:center;
-    background:var(--accent);color:white;flex-direction:column;z-index:9999;
-    transform:scale(0.98);opacity:0;
-    transition:transform .12s ease-out,opacity .12s ease-out;
-  }
-  .scare.show{transform:scale(1);opacity:1;}
-  .scare h2{font-size:96px;margin:0;letter-spacing:6px;text-shadow:0 8px 30px rgba(0,0,0,0.4)}
-  .scare p{font-size:20px;margin-top:10px}
-  /* efeito shake */
-  @keyframes shake {
-    0%{transform:translateX(0)}
-    10%{transform:translateX(-18px)}
-    20%{transform:translateX(14px)}
-    30%{transform:translateX(-10px)}
-    40%{transform:translateX(8px)}
-    50%{transform:translateX(-6px)}
-    60%{transform:translateX(4px)}
-    70%{transform:translateX(-2px)}
-    100%{transform:translateX(0)}
-  }
-  .scare.show h2{animation:shake .6s cubic-bezier(.36,.07,.19,.97) 0s both}
-  .small-note{margin-top:12px;color:var(--muted);font-size:13px}
-  .controls{margin-top:14px;display:flex;gap:8px;justify-content:center}
-  .ghost{background:transparent;border:1px solid rgba(255,255,255,0.06);color:var(--muted);padding:8px 10px;border-radius:8px;cursor:pointer}
-</style>
-</head>
-<body>
-  <div class="wrap">
-    <div class="card" role="main">
-      <h1>Um pequeno teste de coragem</h1>
-      <p>Fique tranquilo — é só uma brincadeira. Clique no botão abaixo ou espere alguns segundos para a surpresa.</p>
-      <div class="controls">
-        <button class="btn" id="startBtn">Ver a surpresa</button>
-        <button class="ghost" id="cancelBtn">Cancelar</button>
-      </div>
-      <p class="small-note">Compartilhe com cuidado 😉</p>
-    </div>
-  </div>
-
   <!-- Layer do susto -->
   <div id="scare" class="scare" aria-hidden="true">
     <h2 id="scareText">BOO!</h2>
@@ -68,6 +7,9 @@
       <button class="ghost" id="closeBtn">Fechar</button>
     </div>
   </div>
+
+  <!-- Áudio de susto (som externo) -->
+  <audio id="scareAudio" src="susto.mp3" preload="auto"></audio>
 
 <script>
 /*
@@ -81,6 +23,7 @@ const cancelBtn = document.getElementById('cancelBtn');
 const scare = document.getElementById('scare');
 const closeBtn = document.getElementById('closeBtn');
 const muteBtn = document.getElementById('muteBtn');
+const scareAudio = document.getElementById('scareAudio');
 
 let autoTimer = null;
 let soundEnabled = true;
@@ -94,33 +37,25 @@ function playScareSound(){
     if(!AudioContext) return false;
     if(!actx) actx = new AudioContext();
     const now = actx.currentTime;
-    // criar ruído branco com envelope curto
     const bufferSize = 2 * actx.sampleRate;
     const buffer = actx.createBuffer(1, bufferSize, actx.sampleRate);
     const data = buffer.getChannelData(0);
     for(let i=0;i<bufferSize;i++){
-      // ruído com envelope
       data[i] = (Math.random()*2-1) * Math.exp(-i/(0.5*actx.sampleRate));
     }
     const noise = actx.createBufferSource();
     noise.buffer = buffer;
-
-    // filtro para dar "impacto"
     const band = actx.createBiquadFilter();
     band.type = 'highpass';
     band.frequency.value = 600;
     band.Q.value = 0.7;
-
-    // gain envelope
     const gain = actx.createGain();
     gain.gain.setValueAtTime(0.0001, now);
     gain.gain.exponentialRampToValueAtTime(1.2, now + 0.02);
     gain.gain.exponentialRampToValueAtTime(0.0001, now + 0.35);
-
     noise.connect(band);
     band.connect(gain);
     gain.connect(actx.destination);
-
     noise.start(now);
     noise.stop(now + 0.5);
     return true;
@@ -130,13 +65,16 @@ function playScareSound(){
 }
 
 function showScare(withSoundAttempt = true){
-  // mostra visual
   scare.setAttribute('aria-hidden', 'false');
   requestAnimationFrame(()=> scare.classList.add('show'));
-  // tenta tocar som
   if(soundEnabled && withSoundAttempt){
-    const played = playScareSound();
-    if(played) audioAllowed = true;
+    if(scareAudio){
+      scareAudio.currentTime = 0;
+      scareAudio.play().then(() => audioAllowed = true).catch(() => {});
+    } else {
+      const played = playScareSound();
+      if(played) audioAllowed = true;
+    }
   }
 }
 
@@ -145,14 +83,11 @@ function hideScare(){
   setTimeout(()=> scare.setAttribute('aria-hidden','true'), 300);
 }
 
-// eventos
 startBtn.addEventListener('click', (e)=>{
-  // cancelar timer se existir
   if(autoTimer) { clearTimeout(autoTimer); autoTimer = null; }
-  // tentar ativar áudio — necessário gesto do usuário
   const ok = playScareSound();
   if(ok) audioAllowed = true;
-  showScare(!ok ? false : true);
+  showScare(true);
 });
 
 cancelBtn.addEventListener('click', ()=>{
@@ -167,19 +102,15 @@ muteBtn.addEventListener('click', ()=>{
   alert('Som desativado.');
 });
 
-// tentativa automática após 5s (apenas visual se áudio bloqueado)
 autoTimer = setTimeout(()=>{
-  // ao tentar tocar antes de interação, muitos navegadores bloquearão; ainda assim mostramos visual.
   const played = playScareSound();
   if(played) audioAllowed = true;
   showScare(!played ? false : true);
   autoTimer = null;
 }, 5000);
 
-// Se quiser personalizar os textos, altere estes valores:
 document.getElementById('scareText').textContent = 'BOO!';
 document.getElementById('scareSub').textContent = 'Peguei você!';
-
 </script>
 </body>
 </html>
